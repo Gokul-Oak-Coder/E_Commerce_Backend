@@ -1,0 +1,101 @@
+<?php
+
+namespace App\Models;
+
+// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Support\Facades\Hash;
+class User extends Authenticatable
+{
+    /** @use HasFactory<\Database\Factories\UserFactory> */
+    use HasApiTokens, HasFactory, Notifiable;
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var list<string>
+     */
+    protected $fillable = [
+        'name',
+        'email',
+        'phone',
+        'password',
+        'role',
+        'firebase_uid',
+        'profile_image',
+        'is_active'
+    ];
+
+    /**
+     * The attributes that should be hidden for serialization.
+     *
+     * @var list<string>
+     */
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
+        ];
+    }
+
+    public function setEmailAttribute($value)
+    {
+        $this->attributes['email'] = strtolower($value);
+    }
+
+    // Seller → Store
+    public function store()
+    {
+        return $this->hasOne(Store::class, 'seller_id');
+    }
+
+    // Customer → Cart
+    public function cart()
+    {
+        return $this->hasOne(Cart::class, 'customer_id');
+    }
+
+    // Customer → Orders
+    public function orders()
+    {
+        return $this->hasMany(Order::class, 'customer_id');
+    }
+
+    // Delivery → Assigned SubOrders
+    public function deliverySubOrders()
+    {
+        return $this->hasMany(SubOrder::class, 'delivery_id');
+    }
+
+    // Customer → Product Reviews
+    public function productReviews()
+    {
+        return $this->hasMany(ProductReview::class, 'customer_id');
+    }
+
+    // Customer → Store Reviews
+    public function storeReviews()
+    {
+        return $this->hasMany(StoreReview::class, 'customer_id');
+    }
+
+    // User → Device Tokens
+    public function deviceTokens()
+    {
+        return $this->hasMany(DeviceToken::class);
+    }
+}

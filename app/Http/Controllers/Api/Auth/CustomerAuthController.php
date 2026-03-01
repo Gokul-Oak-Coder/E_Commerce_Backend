@@ -6,11 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Kreait\Firebase\Contract\Auth;
+use Kreait\Laravel\Firebase\Facades\Firebase;
 
 class CustomerAuthController extends Controller
 {
     public function __construct(protected Auth $auth)
     {
+        $this->firebaseAuth = Firebase::auth();
     }
 
     public function firebaseLogin(Request $request)
@@ -35,12 +37,13 @@ class CustomerAuthController extends Controller
                 ['phone' => $phone],
                 [
                     'name' => 'Customer ' . substr($phone, -4),
-                    'email' => $uid . '@firebase.com', // placeholder
+                    'email' => null, // placeholder
                     'password' => bcrypt($uid),
                     'role' => 'customer',
                     'phone' => $phone,
                 ]
             );
+            $user->update(['firebase_uid' => $uid]);
 
             // Revoke old tokens and issue new one
             $user->tokens()->delete();

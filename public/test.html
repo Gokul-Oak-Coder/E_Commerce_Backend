@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Reverb Test</title>
+    <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
+</head>
+<body>
+    <h2>Reverb WebSocket Test</h2>
+    <div id="status">Connecting...</div>
+    <div id="messages" style="margin-top:20px;font-family:monospace;"></div>
+
+    <script>
+        Pusher.logToConsole = true;
+
+        const pusher = new Pusher('zgbdaxaz7j1w4il0iict', {
+            wsHost:            'localhost',
+            wsPort:            8080,
+            forceTLS:          false,
+            disableStats:      true,
+            enabledTransports: ['ws'],
+            cluster:           'mt1',
+        });
+
+        pusher.connection.bind('connected', () => {
+            document.getElementById('status').innerHTML =
+                '<b style="color:green">✅ Connected to Reverb!</b>';
+        });
+
+        pusher.connection.bind('error', (err) => {
+            document.getElementById('status').innerHTML =
+                '<b style="color:red">❌ ' + JSON.stringify(err) + '</b>';
+        });
+
+        pusher.connection.bind('disconnected', () => {
+            document.getElementById('status').innerHTML =
+                '<b style="color:orange">⚠️ Disconnected</b>';
+        });
+
+        // Public channel — no auth needed
+        const channel = pusher.subscribe('test-channel');
+
+        channel.bind('order.status.updated', (data) => {
+            const div = document.createElement('div');
+            div.innerHTML = '📦 <b>Event received at ' +
+                new Date().toLocaleTimeString() + ':</b> ' +
+                JSON.stringify(data);
+            div.style.color = 'green';
+            div.style.padding = '8px';
+            div.style.border = '1px solid green';
+            div.style.margin = '4px 0';
+            document.getElementById('messages').prepend(div);
+        });
+    </script>
+</body>
+</html>
+EOF

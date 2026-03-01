@@ -10,8 +10,10 @@ class OrderItem extends Model
     protected $fillable = [
         'sub_order_id',
         'product_id',
+        'product_name',
         'quantity',
         'price',
+        'total',
     ];
     // OrderItem → SubOrder
     public function subOrder()

@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -14,7 +13,13 @@ return new class extends Migration
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
             $table->foreignId('customer_id')->constrained('users')->cascadeOnDelete();
+            $table->string('order_number')->unique(); // ✅ add this
             $table->decimal('total_amount', 10, 2);
+            $table->decimal('discount', 10, 2)->default(0);   // ✅ add this
+            $table->decimal('shipping', 10, 2)->default(0);    // ✅ add this
+            $table->decimal('tax', 10, 2)->default(0);         // ✅ add this
+            $table->text('delivery_address');                  // ✅ add this
+            $table->string('payment_method');                  // ✅ add this
             $table->enum('payment_status', ['pending', 'paid', 'failed'])->default('pending')->index();
             $table->enum('order_status', [
                 'placed',
@@ -24,7 +29,6 @@ return new class extends Migration
                 'delivered',
                 'cancelled'
             ])->default('placed')->index();
-
             $table->string('razorpay_order_id')->nullable();
             $table->string('razorpay_payment_id')->nullable();
             $table->timestamps();

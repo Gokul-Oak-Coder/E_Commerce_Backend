@@ -9,7 +9,13 @@ class Order extends Model
     //
     protected $fillable = [
         'customer_id',
+        'order_number',
         'total_amount',
+        'discount',
+        'shipping',
+        'tax',
+        'delivery_address',
+        'payment_method',
         'payment_status',
         'order_status',
         'razorpay_order_id',
